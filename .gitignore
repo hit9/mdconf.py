@@ -2,3 +2,5 @@
 .*.swp
 .*.swo
 venv/
+test.py
+test.md
