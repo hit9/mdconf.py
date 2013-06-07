@@ -4,3 +4,7 @@
 venv/
 test.py
 test.md
+build
+dist
+mdconf.py.egg*
+

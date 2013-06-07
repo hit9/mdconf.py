@@ -10,6 +10,9 @@
 import misaka
 from misaka import HtmlRenderer
 
+MAP = 11
+LIST = 12
+
 
 class MdconfRenderer(HtmlRenderer):
     """misaka renderer for mdconf"""
@@ -23,7 +26,7 @@ class MdconfRenderer(HtmlRenderer):
         self.conf = {}  # the return var
         self.keys = []  # current group's position
 
-    def put(self, text):
+    def put(self, text, type=MAP):
         """put text to the right position in conf"""
         last = None
         crt = self.conf
@@ -32,13 +35,13 @@ class MdconfRenderer(HtmlRenderer):
             last = crt
             crt = crt.setdefault(key, {})
 
-        index = text.find(":")  # try to find the first ':'
-
-        if index == -1:  # list
+        if type == LIST:
             if not isinstance(last[key], list):
                 last[key] = []
             last[key].append(text.strip())
-        else:  # map
+        elif type == MAP:
+            index = text.find(":")
+            assert index > 0  # index should > 0
             key, value = (
                 text[:index].strip(),
                 text[index+1:].strip(),
@@ -53,20 +56,23 @@ class MdconfRenderer(HtmlRenderer):
         self.keys.append(text.strip())
 
     def list_item(self, text, is_ordered):
-        self.put(text)
+        if ":" in text:
+            self.put(text, type=MAP)
+        else:
+            self.put(text, type=LIST)
 
     def block_code(self, text, lang):
-        self.put(text)
+        self.put(text, type=LIST)
 
 
 class MdconfParser(object):
 
-    def __init__(self):
-        extensions = (
+    def __init__(self, extensions=(
             misaka.EXT_FENCED_CODE |
             misaka.EXT_NO_INTRA_EMPHASIS |
             misaka.EXT_AUTOLINK
         )
+    ):
         self.renderer = MdconfRenderer()
         self.markdown = misaka.Markdown(self.renderer, extensions=extensions)
 
