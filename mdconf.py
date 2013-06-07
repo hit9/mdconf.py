@@ -49,7 +49,6 @@ class MdconfRenderer(HtmlRenderer):
             crt[key] = value
 
     def header(self, text, level):
-
         # polish keys to given depth
         while len(self.keys) >= level:
             self.keys.pop()
