@@ -11,6 +11,7 @@ from misaka import HtmlRenderer
 
 
 class MdconfRenderer(HtmlRenderer):
+    """misaka renderer just for mdconf"""
 
     def __init__(self, *args, **kwargs):
         super(MdconfRenderer, self).__init__(*args, **kwargs)
@@ -51,7 +52,7 @@ class MdconfRenderer(HtmlRenderer):
         if index >= 0:
             key, value = (
                 text[:index].strip(),
-                text[:index+1].strip(),
+                text[index+1:].strip(),
             )
             conf = self.slide_to(self.keys)
             conf[key] = value
@@ -81,13 +82,3 @@ parser = MdconfParser()  # build a quick use parser
 
 def parse(text):
     return parser.parse(text)
-
-
-## current tests
-
-s = open("test.md").read()
-print parse(s)
-print parse("""
-# heading
-  - j: 99
-""")
