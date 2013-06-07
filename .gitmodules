@@ -1,0 +1,3 @@
+[submodule "mdconf"]
+	path = mdconf
+	url = git://github.com/visionmedia/mdconf.git

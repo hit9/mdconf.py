@@ -38,13 +38,13 @@ class MdconfRenderer(HtmlRenderer):
         if type == LIST:
             if not isinstance(last[key], list):
                 last[key] = []
-            last[key].append(text.strip())
+            last[key].append(self.normalize(text))
         elif type == MAP:
             index = text.find(":")
             assert index > 0  # index should > 0
             key, value = (
-                text[:index].strip(),
-                text[index+1:].strip(),
+                self.normalize(text[:index]),
+                self.normalize(text[index+1:]),
             )
             crt[key] = value
 
@@ -52,16 +52,25 @@ class MdconfRenderer(HtmlRenderer):
         # polish keys to given depth
         while len(self.keys) >= level:
             self.keys.pop()
-        self.keys.append(text.strip())
+        self.keys.append(self.normalize(text))
 
     def list_item(self, text, is_ordered):
         if ":" in text:
             self.put(text, type=MAP)
         else:
             self.put(text, type=LIST)
+        return self.paragraph(text)
+
+    def paragraph(self, text):
+        """Here returns text no matter wether in list"""
+        return text
 
     def block_code(self, text, lang):
         self.put(text, type=LIST)
+
+    def normalize(self, text):
+        """util to normalize text to lowercase"""
+        return text.strip().lower()
 
 
 class MdconfParser(object):
