@@ -1,4 +1,5 @@
 # coding=utf8
+#
 # Python implementation for visionmedia's mdconf,
 # the markdown driven configuration::
 #   https://github.com/visionmedia/mdconf
@@ -11,7 +12,7 @@ from misaka import HtmlRenderer
 
 
 class MdconfRenderer(HtmlRenderer):
-    """misaka renderer just for mdconf"""
+    """misaka renderer for mdconf"""
 
     def __init__(self, *args, **kwargs):
         super(MdconfRenderer, self).__init__(*args, **kwargs)
@@ -20,14 +21,7 @@ class MdconfRenderer(HtmlRenderer):
     def reset_vars(self):
         """reset conf retult"""
         self.conf = {}  # the return var
-        self.keys = []  # record current keys
-
-    def normalize_text(func):
-        """decorator to strip the second parameter of func"""
-        def wrapper(self, text, *args, **kwargs):
-            text = text.strip()
-            return func(self, text, *args, **kwargs)
-        return wrapper
+        self.keys = []  # current group's position
 
     def put(self, text):
         """put text to the right position in conf"""
@@ -43,7 +37,7 @@ class MdconfRenderer(HtmlRenderer):
         if index == -1:  # list
             if not isinstance(last[key], list):
                 last[key] = []
-            last[key].append(text)
+            last[key].append(text.strip())
         else:  # map
             key, value = (
                 text[:index].strip(),
@@ -51,17 +45,17 @@ class MdconfRenderer(HtmlRenderer):
             )
             crt[key] = value
 
-    @normalize_text
     def header(self, text, level):
 
         # polish keys to given depth
         while len(self.keys) >= level:
             self.keys.pop()
-        self.keys.append(text)
-        #TODO: initialize the keys?
+        self.keys.append(text.strip())
 
-    @normalize_text
     def list_item(self, text, is_ordered):
+        self.put(text)
+
+    def block_code(self, text, lang):
         self.put(text)
 
 
