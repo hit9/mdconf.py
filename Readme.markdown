@@ -3,6 +3,8 @@ mdconf.py
 
 Python implementation for [visionmedia's mdconf](https://github.com/visionmedia/mdconf) - Markdown driven configuration
 
+[![Build Status](https://travis-ci.org/hit9/mdconf.py.png?branch=master)](https://travis-ci.org/hit9/mdconf.py)
+
 Installation
 ------------
 

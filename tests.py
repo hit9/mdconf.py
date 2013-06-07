@@ -24,6 +24,6 @@ for fn in ls(cases_dir):
         try:
             assert md_conf == json_result
             print "OK: %s  ==  %s" % (md_fp, json_fp)
-        except AssertionError as e:
+        except AssertionError:
             print md_conf
-            raise e
+            raise AssertionError
