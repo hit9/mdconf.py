@@ -29,35 +29,40 @@ class MdconfRenderer(HtmlRenderer):
             return func(self, text, *args, **kwargs)
         return wrapper
 
-    def slide_to(self, keys):
-        """slide to given keys depth dict"""
-        conf = self.conf
-        for key in keys:
-            conf = conf.setdefault(key, {})
-        return conf
+    def put(self, text):
+        """put text to the right position in conf"""
+        last = None
+        crt = self.conf
 
-    @normalize_text
-    def header(self, text, level):
-        # polish keys to given depth
-        while len(self.keys) >= level:
-            self.keys.pop()
-        self.keys.append(text)
-        # check keys
-        self.slide_to(self.keys)
+        for key in self.keys:
+            last = crt
+            crt = crt.setdefault(key, {})
 
-    @normalize_text
-    def list_item(self, text, is_ordered):
         index = text.find(":")  # try to find the first ':'
-        # found, maps
-        if index >= 0:
+
+        if index == -1:  # list
+            if not isinstance(last[key], list):
+                last[key] = []
+            last[key].append(text)
+        else:  # map
             key, value = (
                 text[:index].strip(),
                 text[index+1:].strip(),
             )
-            conf = self.slide_to(self.keys)
-            conf[key] = value
-        else:  # not found, list
-            pass
+            crt[key] = value
+
+    @normalize_text
+    def header(self, text, level):
+
+        # polish keys to given depth
+        while len(self.keys) >= level:
+            self.keys.pop()
+        self.keys.append(text)
+        #TODO: initialize the keys?
+
+    @normalize_text
+    def list_item(self, text, is_ordered):
+        self.put(text)
 
 
 class MdconfParser(object):
